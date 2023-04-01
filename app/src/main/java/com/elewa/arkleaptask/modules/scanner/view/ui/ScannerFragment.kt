@@ -2,12 +2,11 @@ package com.elewa.arkleaptask.modules.scanner.view.ui
 
 import android.Manifest
 import android.app.Activity
+import android.bluetooth.BluetoothAdapter
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.content.res.Resources
 import android.graphics.Bitmap
-import android.opengl.Visibility
 import android.os.Bundle
 import android.print.PrintAttributes
 import android.print.PrintManager
@@ -20,7 +19,6 @@ import android.widget.Toast
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat.getSystemService
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
@@ -43,6 +41,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import java.io.File
 import javax.inject.Inject
+
 
 @AndroidEntryPoint
 class ScannerFragment : BaseFragment<FragmentScannerBinding>() {
@@ -85,44 +84,55 @@ class ScannerFragment : BaseFragment<FragmentScannerBinding>() {
         }
 
         binding.btnPrint.setOnClickListener {
-            if (hasConnectBluetooth() && hasScanBluetooth()) {
-                if (currentItem != null) {
-                    val currentPrinterIp = prefs.getString(PRINTER_IP, null)
-                    if (currentPrinterIp == null) {
-                        startForResult.launch(
-                            Intent(
-                                requireActivity(),
-                                ScanningActivity::class.java
+            if (currentItem != null) {
+                if (isBluetoothEnabled()) {
+                    if (hasConnectBluetooth() && hasScanBluetooth()) {
+
+                        val currentPrinterIp = prefs.getString(PRINTER_IP, null)
+                        if (currentPrinterIp == null) {
+                            startForResult.launch(
+                                Intent(
+                                    requireActivity(),
+                                    ScanningActivity::class.java
+                                )
                             )
-                        )
-                    } else {
-                        viewModel.setupPrinter(currentPrinterIp)
-                    }
+                        } else {
+                            viewModel.setupPrinter(currentPrinterIp)
+                        }
 
 //                    viewModel.printItem(currentItem!!)
-                    if (Printooth.hasPairedPrinter()){
-                        val pdfConverter = PDFConverter()
-                        print(
-                            pdfConverter.createPdf(
-                                requireContext(),
-                                currentItem!!,
-                                requireActivity()
+                        if (Printooth.hasPairedPrinter()) {
+                            val pdfConverter = PDFConverter()
+                            print(
+                                pdfConverter.createPdf(
+                                    requireContext(),
+                                    currentItem!!,
+                                    requireActivity()
+                                )
                             )
-                        )
+                        }
+                    } else {
+                        Toast.makeText(
+                            requireActivity(),
+                            "التطبيق يحتاج لتصريح لاستخدام البلوتوث",
+                            Toast.LENGTH_SHORT
+                        ).show()
                     }
-
                 } else {
-                    Toast.makeText(requireActivity(), "قم بمسح كود الطرد اولا", Toast.LENGTH_SHORT)
-                        .show()
+                    Toast.makeText(
+                        requireActivity(),
+                        "برجاء قم بتشغل البلوتوث",
+                        Toast.LENGTH_SHORT
+                    ).show()
                 }
             } else {
                 Toast.makeText(
                     requireActivity(),
-                    "التطبيق يحتاج لتصريح لاستخدام البلوتوث",
+                    "قم بمسح كود الطرد اولا",
                     Toast.LENGTH_SHORT
-                )
-                    .show()
+                ).show()
             }
+
 
         }
     }
@@ -230,4 +240,9 @@ fun String.toBarcodeBitmap(): Bitmap {
     var bitMatrix = MultiFormatWriter().encode(toString(), BarcodeFormat.CODE_128, 500, 50);
     var barcodeEncoder = BarcodeEncoder();
     return barcodeEncoder.createBitmap(bitMatrix);
+}
+
+fun isBluetoothEnabled(): Boolean {
+    val mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter()
+    return mBluetoothAdapter.isEnabled
 }

@@ -7,4 +7,12 @@
     <string name="barcode_required">كود الطرد مطلوب</string>
     <string name="barcode_wrong">خطأ بـ كود الطرد</string>
     <string name="generic_error">حدث خطأ الرجاء المحاولة مره اخرى</string>
+    <string name="pinter_error">حدثت مشكلة اثناء الطباعة, الرجاء المحاولة مره اخرى</string>
+    <string name="printer_success">تم الطباعة</string>
+    <string name="printer_fail">لم نستطع الاتصال بالطابعة</string>
+    <string name="scan_barcode">قم بمسح كود الطرد اولا</string>
+    <string name="open_bluetooth">برجاء قم بتشغل البلوتوث</string>
+    <string name="permission_for_bluetooth_required">التطبيق يحتاج لتصريح لاستخدام البلوتوث</string>
+    <string name="bluetooth_print">اطبع Bluetooth</string>
+    <string name="pdf_print">PDF اطبع</string>
 </resources>

@@ -1,4 +1,4 @@
-package com.elewa.arkleaptask.modules.scanner.view.uimodel
+package com.elewa.arkleaptask.modules.scanner.presentation.uimodel
 
 data class ItemUiModel(
     var barcode: String,

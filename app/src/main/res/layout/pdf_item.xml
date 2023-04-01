@@ -46,7 +46,7 @@
         app:layout_constraintTop_toBottomOf="@id/txtBarcode" />
 
     <TextView
-        android:id="@+id/txtGoverment"
+        android:id="@+id/txtGovernment"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:textDirection="rtl"
@@ -72,7 +72,7 @@
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/txtGoverment" />
+        app:layout_constraintTop_toBottomOf="@id/txtGovernment" />
 
     <TextView
         android:id="@+id/txtPhone"

@@ -1,6 +1,6 @@
 package com.elewa.arkleaptask.modules.scanner.domain.entity
 
-import com.elewa.arkleaptask.modules.scanner.view.uimodel.ItemUiModel
+import com.elewa.arkleaptask.modules.scanner.presentation.uimodel.ItemUiModel
 
 data class ItemEntity(
     var barcode: String,

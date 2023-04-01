@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:layoutDirection="rtl"
-    tools:context=".modules.scanner.view.ui.ScannerFragment">
+    tools:context=".modules.scanner.presentation.ui.ScannerFragment">
 
 
 
@@ -94,106 +94,6 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-<!--        <androidx.cardview.widget.CardView-->
-<!--            android:id="@+id/cardItem"-->
-<!--            android:visibility="visible"-->
-<!--            android:layout_width="match_parent"-->
-<!--            android:layout_height="wrap_content"-->
-<!--            android:layout_marginStart="8dp"-->
-<!--            android:layout_marginTop="16dp"-->
-<!--            android:layout_marginEnd="8dp"-->
-<!--            android:background="@color/white"-->
-<!--            android:backgroundTint="@color/white"-->
-<!--            android:orientation="vertical"-->
-<!--            android:paddingBottom="16dp"-->
-<!--            app:cardCornerRadius="5dp"-->
-<!--            app:layout_constraintEnd_toEndOf="parent"-->
-<!--            app:layout_constraintStart_toStartOf="parent"-->
-<!--            app:layout_constraintTop_toTopOf="parent">-->
-
-
-<!--            <LinearLayout-->
-<!--                android:layout_width="match_parent"-->
-<!--                android:layout_height="match_parent"-->
-<!--                android:orientation="vertical"-->
-<!--                android:padding="8dp">-->
-
-<!--                <ImageView-->
-<!--                    android:id="@+id/imgBarcode"-->
-<!--                    android:scaleType="centerCrop"-->
-<!--                    android:layout_width="match_parent"-->
-<!--                    android:layout_height="wrap_content"-->
-<!--                    android:layout_marginTop="16dp"-->
-<!--                    android:gravity="center"-->
-<!--                    android:padding="4dp"-->
-<!--                    android:textStyle="bold" />-->
-
-<!--                <TextView-->
-<!--                    android:id="@+id/txtBarcode"-->
-<!--                    android:layout_width="match_parent"-->
-<!--                    android:layout_height="wrap_content"-->
-<!--                    android:gravity="right"-->
-<!--                    android:padding="2dp"-->
-<!--                    android:singleLine="true"-->
-<!--                    android:text=""-->
-<!--                    android:textColor="@color/black"-->
-<!--                    android:textSize="18sp"-->
-<!--                    android:textStyle="bold" />-->
-
-<!--                <TextView-->
-<!--                    android:id="@+id/txtStore"-->
-<!--                    android:layout_width="match_parent"-->
-<!--                    android:layout_height="wrap_content"-->
-<!--                    android:gravity="right"-->
-<!--                    android:padding="2dp"-->
-<!--                    android:singleLine="true"-->
-<!--                    android:text=""-->
-<!--                    android:textColor="@color/black"-->
-<!--                    android:textSize="18sp"-->
-<!--                    android:textStyle="bold" />-->
-
-<!--                <TextView-->
-<!--                    android:id="@+id/txtGoverment"-->
-<!--                    android:layout_width="match_parent"-->
-<!--                    android:layout_height="wrap_content"-->
-<!--                    android:gravity="right"-->
-<!--                    android:padding="2dp"-->
-<!--                    android:singleLine="true"-->
-<!--                    android:text=""-->
-<!--                    android:textColor="@color/black"-->
-<!--                    android:textSize="18sp"-->
-<!--                    android:textStyle="bold" />-->
-
-<!--                <TextView-->
-<!--                    android:id="@+id/txtArea"-->
-<!--                    android:layout_width="match_parent"-->
-<!--                    android:layout_height="wrap_content"-->
-<!--                    android:gravity="right"-->
-<!--                    android:padding="2dp"-->
-<!--                    android:singleLine="true"-->
-<!--                    android:text=""-->
-<!--                    android:textColor="@color/black"-->
-<!--                    android:textSize="18sp"-->
-<!--                    android:textStyle="bold" />-->
-
-<!--                <TextView-->
-<!--                    android:id="@+id/txtPhone"-->
-<!--                    android:layout_width="match_parent"-->
-<!--                    android:layout_height="wrap_content"-->
-<!--                    android:layout_marginBottom="16dp"-->
-<!--                    android:gravity="right"-->
-<!--                    android:padding="2dp"-->
-<!--                    android:singleLine="true"-->
-<!--                    android:text=""-->
-<!--                    android:textColor="@color/black"-->
-<!--                    android:textSize="18sp"-->
-<!--                    android:textStyle="bold" />-->
-
-
-<!--            </LinearLayout>-->
-
-
-<!--        </androidx.cardview.widget.CardView>-->
 
         <androidx.cardview.widget.CardView
             android:id="@+id/cardItem"
@@ -227,21 +127,41 @@
         android:layout_height="1dp"
         android:layout_marginBottom="8dp"
         android:background="@color/gray"
-        app:layout_constraintBottom_toTopOf="@+id/btnPrint"
+        app:layout_constraintBottom_toTopOf="@+id/linearBtn"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/btnPrint"
-        android:backgroundTint="@color/colorPrimaryDark"
+    <LinearLayout
+        android:id="@+id/linearBtn"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginBottom="8dp"
-        android:text="اطبع"
+        android:orientation="horizontal"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toStartOf="parent">
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnPrintPDF"
+            android:backgroundTint="@color/colorPrimaryDark"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginBottom="8dp"
+            android:text="@string/pdf_print" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnPrintBluetooth"
+            android:backgroundTint="@color/colorPrimaryDark"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginBottom="8dp"
+            android:text="@string/bluetooth_print" />
+    </LinearLayout>
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>

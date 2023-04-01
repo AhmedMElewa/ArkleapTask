@@ -14,11 +14,9 @@ import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.core.content.FileProvider
-import androidx.recyclerview.widget.RecyclerView
 import com.elewa.arkleaptask.R
-import com.elewa.arkleaptask.modules.scanner.domain.entity.ItemEntity
-import com.elewa.arkleaptask.modules.scanner.view.ui.toBarcodeBitmap
-import com.elewa.arkleaptask.modules.scanner.view.uimodel.ItemUiModel
+import com.elewa.arkleaptask.modules.scanner.presentation.ui.toBarcodeBitmap
+import com.elewa.arkleaptask.modules.scanner.presentation.uimodel.ItemUiModel
 import java.io.File
 import java.io.FileOutputStream
 
@@ -32,14 +30,14 @@ class PDFConverter {
     ): Bitmap {
         val imgBarcode = view.findViewById<ImageView>(R.id.imgBarcode)
         val txtBarcode = view.findViewById<TextView>(R.id.txtBarcode)
-        val txtGoverment = view.findViewById<TextView>(R.id.txtGoverment)
+        val txtGovernment = view.findViewById<TextView>(R.id.txtGovernment)
         val txtArea = view.findViewById<TextView>(R.id.txtArea)
         val txtStore = view.findViewById<TextView>(R.id.txtStore)
         val txtPhone = view.findViewById<TextView>(R.id.txtPhone)
         with(pdfDetails) {
             txtBarcode.text = barcode
             txtArea.text = area
-            txtGoverment.text = government
+            txtGovernment.text = government
             txtPhone.text = phoneNumber
             txtStore.text = store
             imgBarcode.setImageBitmap(barcode.toBarcodeBitmap());
@@ -87,6 +85,7 @@ class PDFConverter {
         val filePath = File(context.getExternalFilesDir(null), "bitmapPdf.pdf")
         pdfDocument.writeTo(FileOutputStream(filePath))
         pdfDocument.close()
+        // to render pdf and open it in pdf view using device apps(pdf viewer)
 //        renderPdf(context, filePath)
         return filePath
     }

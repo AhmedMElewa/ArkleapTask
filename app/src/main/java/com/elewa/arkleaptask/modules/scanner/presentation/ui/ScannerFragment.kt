@@ -1,4 +1,4 @@
-package com.elewa.arkleaptask.modules.scanner.view.ui
+package com.elewa.arkleaptask.modules.scanner.presentation.ui
 
 import android.Manifest
 import android.app.Activity
@@ -23,13 +23,14 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import com.elewa.arkleaptask.R
 import com.elewa.arkleaptask.base.BaseFragment
 import com.elewa.arkleaptask.core.model.ResourceUiState
 import com.elewa.arkleaptask.core.preference.PrefsName.PRINTER_IP
 import com.elewa.arkleaptask.core.preference.SharedPrefsManager
 import com.elewa.arkleaptask.databinding.FragmentScannerBinding
-import com.elewa.arkleaptask.modules.scanner.view.uimodel.ItemUiModel
-import com.elewa.arkleaptask.modules.scanner.view.viewmodel.ScannerViewModel
+import com.elewa.arkleaptask.modules.scanner.presentation.uimodel.ItemUiModel
+import com.elewa.arkleaptask.modules.scanner.presentation.viewmodel.ScannerViewModel
 import com.elewa.arkleaptask.util.PDFConverter
 import com.elewa.arkleaptask.util.PDFDocumentAdapter
 import com.google.zxing.BarcodeFormat
@@ -64,14 +65,6 @@ class ScannerFragment : BaseFragment<FragmentScannerBinding>() {
         initObservers()
     }
 
-    private fun print(file: File) {
-        val manager = requireActivity().getSystemService(Context.PRINT_SERVICE) as PrintManager
-
-        val adapter = PDFDocumentAdapter(file)
-        val attributes = PrintAttributes.Builder().build()
-        manager.print("Document", adapter, attributes)
-    }
-
     private fun initView() {
 
         binding.etxtBarcode.setOnEditorActionListener { v, actionId, event ->
@@ -83,7 +76,28 @@ class ScannerFragment : BaseFragment<FragmentScannerBinding>() {
             }
         }
 
-        binding.btnPrint.setOnClickListener {
+        binding.btnPrintPDF.setOnClickListener {
+            if (currentItem != null) {
+                val pdfConverter = PDFConverter()
+                print(
+                    pdfConverter.createPdf(
+                        requireContext(),
+                        currentItem!!,
+                        requireActivity()
+                    )
+                )
+            } else {
+                Toast.makeText(
+                    requireActivity(),
+                    getString(R.string.scan_barcode),
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
+
+
+        }
+
+        binding.btnPrintBluetooth.setOnClickListener {
             if (currentItem != null) {
                 if (isBluetoothEnabled()) {
                     if (hasConnectBluetooth() && hasScanBluetooth()) {
@@ -100,35 +114,27 @@ class ScannerFragment : BaseFragment<FragmentScannerBinding>() {
                             viewModel.setupPrinter(currentPrinterIp)
                         }
 
-//                    viewModel.printItem(currentItem!!)
                         if (Printooth.hasPairedPrinter()) {
-                            val pdfConverter = PDFConverter()
-                            print(
-                                pdfConverter.createPdf(
-                                    requireContext(),
-                                    currentItem!!,
-                                    requireActivity()
-                                )
-                            )
+                            viewModel.printItem(currentItem!!)
                         }
                     } else {
                         Toast.makeText(
                             requireActivity(),
-                            "التطبيق يحتاج لتصريح لاستخدام البلوتوث",
+                            getString(R.string.permission_for_bluetooth_required),
                             Toast.LENGTH_SHORT
                         ).show()
                     }
                 } else {
                     Toast.makeText(
                         requireActivity(),
-                        "برجاء قم بتشغل البلوتوث",
+                        getString(R.string.open_bluetooth),
                         Toast.LENGTH_SHORT
                     ).show()
                 }
             } else {
                 Toast.makeText(
                     requireActivity(),
-                    "قم بمسح كود الطرد اولا",
+                    getString(R.string.scan_barcode),
                     Toast.LENGTH_SHORT
                 ).show()
             }
@@ -167,7 +173,7 @@ class ScannerFragment : BaseFragment<FragmentScannerBinding>() {
                             with(state.itemState) {
                                 binding.pdfLayout.txtBarcode.text = barcode
                                 binding.pdfLayout.txtArea.text = area
-                                binding.pdfLayout.txtGoverment.text = government
+                                binding.pdfLayout.txtGovernment.text = government
                                 binding.pdfLayout.txtPhone.text = phoneNumber
                                 binding.pdfLayout.txtStore.text = store
                                 binding.textInputBarcode.isErrorEnabled = false
@@ -182,10 +188,27 @@ class ScannerFragment : BaseFragment<FragmentScannerBinding>() {
                             binding.textInputBarcode.error = getString(state.message)
                             currentItem = null
                         }
+                        is ResourceUiState.PrinterState -> {
+                            binding.textInputBarcode.isErrorEnabled = false
+                            Toast.makeText(requireContext(), state.message, Toast.LENGTH_SHORT)
+                                .show()
+                        }
+                        else -> {
+                            binding.progressBlue.visibility = View.GONE
+                            binding.cardItem.visibility = View.GONE
+                        }
                     }
                 }
             }
         }
+    }
+
+    private fun print(file: File) {
+        val manager = requireActivity().getSystemService(Context.PRINT_SERVICE) as PrintManager
+
+        val adapter = PDFDocumentAdapter(file)
+        val attributes = PrintAttributes.Builder().build()
+        manager.print("Document", adapter, attributes)
     }
 
     private fun hasConnectBluetooth() =

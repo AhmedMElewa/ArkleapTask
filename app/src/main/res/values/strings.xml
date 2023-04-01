@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">ArkleapTask</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="barcode_printing">طباعة الباركود</string>
+    <string name="code_input">كود الطرد</string>
+    <string name="barcode_required">كود الطرد مطلوب</string>
+    <string name="barcode_wrong">خطأ بـ كود الطرد</string>
+    <string name="generic_error">حدث خطأ الرجاء المحاولة مره اخرى</string>
+</resources>

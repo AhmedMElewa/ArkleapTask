@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_margin="10dp">
+
+    <ImageView
+        android:id="@+id/imgBarcode"
+        android:layout_width="0dp"
+        android:scaleType="fitXY"
+        android:layout_height="40dp"
+        android:layout_marginTop="5dp"
+        android:layout_marginBottom="5dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/txtBarcode"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_margin="5dp"
+        android:paddingStart="35dp"
+        android:paddingEnd="35dp"
+        android:textColor="@color/black"
+        android:textDirection="rtl"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/imgBarcode" />
+
+    <TextView
+        android:id="@+id/txtStore"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:textDirection="rtl"
+        android:paddingStart="35dp"
+        android:paddingEnd="35dp"
+        android:layout_margin="5dp"
+        android:textColor="@color/black"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/txtBarcode" />
+
+    <TextView
+        android:id="@+id/txtGoverment"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:textDirection="rtl"
+        android:paddingStart="35dp"
+        android:paddingEnd="35dp"
+        android:layout_margin="5dp"
+        android:textColor="@color/black"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/txtStore" />
+
+
+    <TextView
+        android:id="@+id/txtArea"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:textDirection="rtl"
+        android:paddingStart="35dp"
+        android:paddingEnd="35dp"
+        android:layout_margin="5dp"
+        android:textColor="@color/black"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/txtGoverment" />
+
+    <TextView
+        android:id="@+id/txtPhone"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:textDirection="rtl"
+        android:paddingStart="35dp"
+        android:paddingEnd="35dp"
+        android:layout_margin="5dp"
+        android:textColor="@color/black"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/txtArea" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

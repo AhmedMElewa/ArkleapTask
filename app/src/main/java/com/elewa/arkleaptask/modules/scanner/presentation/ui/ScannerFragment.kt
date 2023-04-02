@@ -25,10 +25,11 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.elewa.arkleaptask.R
 import com.elewa.arkleaptask.base.BaseFragment
-import com.elewa.arkleaptask.core.model.ResourceUiState
+import com.elewa.arkleaptask.core.model.ItemUiState
 import com.elewa.arkleaptask.core.preference.PrefsName.PRINTER_IP
 import com.elewa.arkleaptask.core.preference.SharedPrefsManager
 import com.elewa.arkleaptask.databinding.FragmentScannerBinding
+import com.elewa.arkleaptask.modules.scanner.presentation.uimodel.ItemSideEffects
 import com.elewa.arkleaptask.modules.scanner.presentation.uimodel.ItemUiModel
 import com.elewa.arkleaptask.modules.scanner.presentation.viewmodel.ScannerViewModel
 import com.elewa.arkleaptask.util.PDFConverter
@@ -39,6 +40,7 @@ import com.journeyapps.barcodescanner.BarcodeEncoder
 import com.mazenrashed.printooth.Printooth
 import com.mazenrashed.printooth.ui.ScanningActivity
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import java.io.File
 import javax.inject.Inject
@@ -63,6 +65,7 @@ class ScannerFragment : BaseFragment<FragmentScannerBinding>() {
         requestPermissions()
         initView()
         initObservers()
+        initEffectObservation()
     }
 
     private fun initView() {
@@ -112,6 +115,9 @@ class ScannerFragment : BaseFragment<FragmentScannerBinding>() {
                             )
                         } else {
                             viewModel.setupPrinter(currentPrinterIp)
+                            binding.btnPrintBluetooth.isEnabled = false
+                            binding.btnPrintPDF.isEnabled = false
+                            binding.etxtBarcode.isEnabled = false
                         }
 
                         if (Printooth.hasPairedPrinter()) {
@@ -156,17 +162,19 @@ class ScannerFragment : BaseFragment<FragmentScannerBinding>() {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.uiState.collect { state ->
                     when (state) {
-                        is ResourceUiState.Empty -> {
+                        is ItemUiState.Empty -> {
                             binding.progressBlue.visibility = View.GONE
                             binding.cardItem.visibility = View.GONE
                             currentItem = null
                         }
-                        is ResourceUiState.Loading -> {
-                            binding.progressBlue.visibility = View.VISIBLE
-                            binding.cardItem.visibility = View.GONE
-                            currentItem = null
+                        is ItemUiState.Loading -> {
+                            if (state.loading) {
+                                binding.progressBlue.visibility = View.VISIBLE
+                            } else {
+                                binding.progressBlue.visibility = View.GONE
+                            }
                         }
-                        is ResourceUiState.Loaded -> {
+                        is ItemUiState.Loaded -> {
                             binding.progressBlue.visibility = View.GONE
                             binding.cardItem.visibility = View.VISIBLE
                             currentItem = state.itemState
@@ -181,22 +189,35 @@ class ScannerFragment : BaseFragment<FragmentScannerBinding>() {
                             }
 
                         }
-                        is ResourceUiState.Error -> {
-                            binding.progressBlue.visibility = View.GONE
-                            binding.cardItem.visibility = View.GONE
-                            binding.textInputBarcode.isErrorEnabled = true
-                            binding.textInputBarcode.error = getString(state.message)
-                            currentItem = null
-                        }
-                        is ResourceUiState.PrinterState -> {
-                            binding.textInputBarcode.isErrorEnabled = false
-                            Toast.makeText(requireContext(), state.message, Toast.LENGTH_SHORT)
-                                .show()
-                        }
                         else -> {
                             binding.progressBlue.visibility = View.GONE
                             binding.cardItem.visibility = View.GONE
                         }
+                    }
+                }
+            }
+        }
+    }
+
+    private fun initEffectObservation() {
+        lifecycleScope.launchWhenStarted {
+            viewModel.uiEffects.collectLatest { effect ->
+                when (effect) {
+                    is ItemSideEffects.Error -> {
+                        binding.progressBlue.visibility = View.GONE
+                        binding.cardItem.visibility = View.GONE
+                        binding.textInputBarcode.isErrorEnabled = true
+                        binding.textInputBarcode.error = getString(effect.message)
+                        currentItem = null
+                    }
+                    is ItemSideEffects.PrinterState -> {
+                        binding.btnPrintBluetooth.isEnabled = true
+                        binding.btnPrintPDF.isEnabled = true
+                        binding.etxtBarcode.isEnabled = true
+                        binding.progressBlue.visibility = View.GONE
+                        binding.textInputBarcode.isErrorEnabled = false
+                        Toast.makeText(requireContext(), effect.message, Toast.LENGTH_SHORT)
+                            .show()
                     }
                 }
             }

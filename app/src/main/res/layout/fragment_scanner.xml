@@ -84,15 +84,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textInputBarcode">
 
-        <ProgressBar
-            android:id="@+id/progress_blue"
-            android:visibility="gone"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+
 
 
         <androidx.cardview.widget.CardView
@@ -162,6 +154,27 @@
             android:layout_marginBottom="8dp"
             android:text="@string/bluetooth_print" />
     </LinearLayout>
+
+    <FrameLayout
+        android:id="@+id/progress_blue"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:background="#22000000"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <ProgressBar
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+    </FrameLayout>
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

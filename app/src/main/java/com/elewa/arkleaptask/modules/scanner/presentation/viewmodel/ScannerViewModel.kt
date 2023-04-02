@@ -5,10 +5,11 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.elewa.arkleaptask.R
 import com.elewa.arkleaptask.core.model.DomainExceptions
-import com.elewa.arkleaptask.core.model.ResourceUiState
+import com.elewa.arkleaptask.core.model.ItemUiState
 import com.elewa.arkleaptask.modules.scanner.domain.entity.BarcodeException
 import com.elewa.arkleaptask.modules.scanner.domain.interactor.ScanBarcode
 import com.elewa.arkleaptask.modules.scanner.presentation.ui.toBarcodeBitmap
+import com.elewa.arkleaptask.modules.scanner.presentation.uimodel.ItemSideEffects
 import com.elewa.arkleaptask.modules.scanner.presentation.uimodel.ItemUiModel
 import com.mazenrashed.printooth.Printooth
 import com.mazenrashed.printooth.data.printable.ImagePrintable
@@ -19,7 +20,9 @@ import com.mazenrashed.printooth.utilities.PrintingCallback
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -27,17 +30,21 @@ import javax.inject.Inject
 @HiltViewModel
 class ScannerViewModel @Inject constructor(private val scanBarcode: ScanBarcode) : ViewModel() {
 
-    private val _uiState = MutableStateFlow<ResourceUiState>(ResourceUiState.Empty)
-    val uiState: StateFlow<ResourceUiState> = _uiState
+    private val _uiState = MutableStateFlow<ItemUiState>(ItemUiState.Empty)
+    val uiState: StateFlow<ItemUiState> = _uiState
+
+    val uiEffects = MutableSharedFlow<ItemSideEffects>(0)
 
     fun scanBarcode(barcode: String) {
-        _uiState.value = ResourceUiState.Loading
+        _uiState.value = ItemUiState.Empty
+        _uiState.value = ItemUiState.Loading(true)
         viewModelScope.launch(Dispatchers.IO) {
             scanBarcode.execute(barcode).fold({
                 //delay for view of progress
                 delay(500)
-                _uiState.value = ResourceUiState.Loaded(it.mapToUiModel())
+                _uiState.value = ItemUiState.Loaded(it.mapToUiModel())
             }, {
+                _uiState.value = ItemUiState.Empty
                 it.handleError()
             })
         }
@@ -49,7 +56,7 @@ class ScannerViewModel @Inject constructor(private val scanBarcode: ScanBarcode)
 
 
     fun printItem(currentItem: ItemUiModel) {
-
+        _uiState.value = ItemUiState.Loading(true)
         if (Printooth.hasPairedPrinter()) {
             var printables = ArrayList<Printable>()
             printables.add(
@@ -72,36 +79,43 @@ class ScannerViewModel @Inject constructor(private val scanBarcode: ScanBarcode)
 
                 override fun printingOrderSentSuccessfully() {
                     Log.i("Elewa", "Success")
-                    _uiState.value = ResourceUiState.PrinterState(R.string.printer_success)
-
+                    updateEffect(ItemSideEffects.PrinterState(R.string.printer_success))
+                    _uiState.value = ItemUiState.Loading(false)
                 }  //printer was received your printing order successfully.
 
                 override fun connectionFailed(error: String) {
                     Log.i("Elewa", error)
-                    _uiState.value = ResourceUiState.PrinterState(R.string.printer_fail)
+                    updateEffect(ItemSideEffects.PrinterState(R.string.printer_fail))
+                    _uiState.value = ItemUiState.Loading(false)
                 }
 
                 override fun disconnected() {
                     Log.i("Elewa", "disconnected")
+                    _uiState.value = ItemUiState.Loading(false)
                 }
 
                 override fun onError(error: String) {
                     Log.i("Elewa", error)
-                    _uiState.value = ResourceUiState.PrinterState(R.string.pinter_error)
-
+                    updateEffect(ItemSideEffects.PrinterState(R.string.pinter_error))
+                    _uiState.value = ItemUiState.Loading(false)
                 }
 
                 override fun onMessage(message: String) {
                     Log.i("Elewa", message)
+                    _uiState.value = ItemUiState.Loading(false)
                 }
             }
-        } else {
-
         }
 
     }
 
-    private fun buildPrintText(text:String): Printable {
+    private fun updateEffect(effect: ItemSideEffects) {
+        viewModelScope.launch {
+            uiEffects.emit(effect)
+        }
+    }
+
+    private fun buildPrintText(text: String): Printable {
         return TextPrintable.Builder()
             .setText(text)
             .setLineSpacing(DefaultPrinter.LINE_SPACING_60)
@@ -115,13 +129,10 @@ class ScannerViewModel @Inject constructor(private val scanBarcode: ScanBarcode)
 
     private fun Throwable.handleError() {
         when (this@handleError) {
-            is BarcodeException.BarcodeRequired -> _uiState.value =
-                ResourceUiState.Error(R.string.barcode_required)
-            is BarcodeException.BarcodeNotValid -> _uiState.value =
-                ResourceUiState.Error(R.string.barcode_wrong)
-            is DomainExceptions.UnknownException -> _uiState.value =
-                ResourceUiState.Error(R.string.generic_error)
-            else -> ResourceUiState.Error(R.string.generic_error)
+            is BarcodeException.BarcodeRequired -> updateEffect(ItemSideEffects.Error(R.string.barcode_required))
+            is BarcodeException.BarcodeNotValid -> updateEffect(ItemSideEffects.Error(R.string.barcode_wrong))
+            is DomainExceptions.UnknownException -> updateEffect(ItemSideEffects.Error(R.string.generic_error))
+            else -> updateEffect(ItemSideEffects.Error(R.string.generic_error))
         }
     }
 

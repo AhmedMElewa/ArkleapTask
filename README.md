@@ -11,7 +11,7 @@ Simple mobile application for scanning and printing barcode for item.
 
 
 ### Installing
-You can download the final apk [here](https://drive.google.com/file/d/1k12epk-4Z7xs3IwXlNZODd0REXdaI5zr/view?usp=drivesdk)
+You can download the final apk [here](https://drive.google.com/file/d/1l375_UTQdO5BjPLNmCIOp5ggGHO6DWRl/view?usp=drivesdk)
 
 #### Project characteristics and tech-stack
 * Tech-stack

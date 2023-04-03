@@ -10,7 +10,6 @@ import android.graphics.Bitmap
 import android.os.Bundle
 import android.print.PrintAttributes
 import android.print.PrintManager
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -59,10 +58,16 @@ class ScannerFragment : BaseFragment<FragmentScannerBinding>() {
     override val bindLayout: (LayoutInflater, ViewGroup?, Boolean) -> FragmentScannerBinding
         get() = FragmentScannerBinding::inflate
 
+    private val requestPermission =
+        registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
+            if (hasConnectBluetooth() && hasScanBluetooth() && hasAccessAresLocation()) {
+                printBluetooth()
+            }
+        }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        requestPermissions()
         initView()
         initObservers()
         initEffectObservation()
@@ -103,27 +108,10 @@ class ScannerFragment : BaseFragment<FragmentScannerBinding>() {
         binding.btnPrintBluetooth.setOnClickListener {
             if (currentItem != null) {
                 if (isBluetoothEnabled()) {
-                    if (hasConnectBluetooth() && hasScanBluetooth()) {
-
-                        val currentPrinterIp = prefs.getString(PRINTER_IP, null)
-                        if (currentPrinterIp == null) {
-                            startForResult.launch(
-                                Intent(
-                                    requireActivity(),
-                                    ScanningActivity::class.java
-                                )
-                            )
-                        } else {
-                            viewModel.setupPrinter(currentPrinterIp)
-                            binding.btnPrintBluetooth.isEnabled = false
-                            binding.btnPrintPDF.isEnabled = false
-                            binding.etxtBarcode.isEnabled = false
-                        }
-
-                        if (Printooth.hasPairedPrinter()) {
-                            viewModel.printItem(currentItem!!)
-                        }
+                    if (hasConnectBluetooth() && hasScanBluetooth() && hasAccessAresLocation()) {
+                        printBluetooth()
                     } else {
+                        requestPermissions()
                         Toast.makeText(
                             requireActivity(),
                             getString(R.string.permission_for_bluetooth_required),
@@ -146,6 +134,27 @@ class ScannerFragment : BaseFragment<FragmentScannerBinding>() {
             }
 
 
+        }
+    }
+
+    private fun printBluetooth() {
+        val currentPrinterIp = prefs.getString(PRINTER_IP, null)
+        if (currentPrinterIp == null) {
+            startForResult.launch(
+                Intent(
+                    requireActivity(),
+                    ScanningActivity::class.java
+                )
+            )
+        } else {
+            viewModel.setupPrinter(currentPrinterIp)
+            binding.btnPrintBluetooth.isEnabled = false
+            binding.btnPrintPDF.isEnabled = false
+            binding.etxtBarcode.isEnabled = false
+        }
+
+        if (Printooth.hasPairedPrinter()) {
+            viewModel.printItem(currentItem!!)
         }
     }
 
@@ -238,6 +247,12 @@ class ScannerFragment : BaseFragment<FragmentScannerBinding>() {
             Manifest.permission.BLUETOOTH_CONNECT
         ) == PackageManager.PERMISSION_GRANTED
 
+    private fun hasAccessAresLocation() =
+        ActivityCompat.checkSelfPermission(
+            requireActivity(),
+            Manifest.permission.ACCESS_FINE_LOCATION
+        ) == PackageManager.PERMISSION_GRANTED
+
     private fun hasScanBluetooth() =
         ActivityCompat.checkSelfPermission(
             requireActivity(),
@@ -252,31 +267,14 @@ class ScannerFragment : BaseFragment<FragmentScannerBinding>() {
         if (!hasConnectBluetooth()) {
             permissionsToReques.add(Manifest.permission.BLUETOOTH_CONNECT)
         }
+        if (!hasAccessAresLocation()) {
+            permissionsToReques.add(Manifest.permission.ACCESS_FINE_LOCATION)
+
+        }
         if (permissionsToReques.isNotEmpty()) {
-            ActivityCompat.requestPermissions(
-                requireActivity(),
-                permissionsToReques.toTypedArray(),
-                0
-            )
+            requestPermission.launch(permissionsToReques.toTypedArray())
         }
     }
-
-    override fun onRequestPermissionsResult(
-        requestCode: Int,
-        permissions: Array<out String>,
-        grantResults: IntArray
-    ) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-
-        if (requestCode == 0 && grantResults.isNotEmpty()) {
-            for (i in grantResults.indices) {
-                if (grantResults[i] == PackageManager.PERMISSION_GRANTED) {
-                    Log.i("Permission", "PERMISSION_GRANTED")
-                }
-            }
-        }
-    }
-
 }
 
 

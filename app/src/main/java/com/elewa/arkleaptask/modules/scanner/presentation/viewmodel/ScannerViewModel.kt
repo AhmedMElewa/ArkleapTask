@@ -12,6 +12,7 @@ import com.elewa.arkleaptask.modules.scanner.presentation.ui.toBarcodeBitmap
 import com.elewa.arkleaptask.modules.scanner.presentation.uimodel.ItemSideEffects
 import com.elewa.arkleaptask.modules.scanner.presentation.uimodel.ItemUiModel
 import com.mazenrashed.printooth.Printooth
+import com.mazenrashed.printooth.data.converter.ArabicConverter
 import com.mazenrashed.printooth.data.printable.ImagePrintable
 import com.mazenrashed.printooth.data.printable.Printable
 import com.mazenrashed.printooth.data.printable.TextPrintable
@@ -22,10 +23,10 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+
 
 @HiltViewModel
 class ScannerViewModel @Inject constructor(private val scanBarcode: ScanBarcode) : ViewModel() {
@@ -59,6 +60,7 @@ class ScannerViewModel @Inject constructor(private val scanBarcode: ScanBarcode)
         _uiState.value = ItemUiState.Loading(true)
         if (Printooth.hasPairedPrinter()) {
             var printables = ArrayList<Printable>()
+
             printables.add(
                 ImagePrintable.Builder(currentItem.barcode.toBarcodeBitmap())
                     .setAlignment(DefaultPrinter.ALIGNMENT_CENTER)
@@ -75,8 +77,6 @@ class ScannerViewModel @Inject constructor(private val scanBarcode: ScanBarcode)
                 override fun connectingWithPrinter() {
                     Log.i("Elewa", "connected")
                 }
-
-
                 override fun printingOrderSentSuccessfully() {
                     Log.i("Elewa", "Success")
                     updateEffect(ItemSideEffects.PrinterState(R.string.printer_success))
@@ -109,6 +109,8 @@ class ScannerViewModel @Inject constructor(private val scanBarcode: ScanBarcode)
 
     }
 
+
+
     private fun updateEffect(effect: ItemSideEffects) {
         viewModelScope.launch {
             uiEffects.emit(effect)
@@ -118,6 +120,8 @@ class ScannerViewModel @Inject constructor(private val scanBarcode: ScanBarcode)
     private fun buildPrintText(text: String): Printable {
         return TextPrintable.Builder()
             .setText(text)
+            .setCharacterCode(22)
+            .setCustomConverter(ArabicConverter())
             .setLineSpacing(DefaultPrinter.LINE_SPACING_60)
             .setAlignment(DefaultPrinter.ALIGNMENT_CENTER)
             .setFontSize(DefaultPrinter.FONT_SIZE_LARGE)
